@@ -2,45 +2,25 @@ import numpy as np
 import imageio as iio
 from arbfls.config import config_dict
 import arbfls.utils as utils
-
+from arbfls.sad import sad, minimize_sad
 """
-Supported heuristics:
--Flat: simple heuristic, if x >= 0 then its rewarded, else, penalized
-    *params => {alpha : number >= 0 }
+Heuristicas para complementatr a minimizacao da SAD baseando-se na posicao relativa do bloco
 """
 
 
 
-def sad(leftY:int, leftX:int, rightY:int, rightX:int,
-        left_channel:np.ndarray, right_channel:np.ndarray, config:dict=config_dict
-        ) -> int:
-    bs = config["block_size"] #Shortens the expression
-    return np.sum(np.abs(left_channel[leftY:leftY+bs, leftX:leftX+bs] - right_channel[rightY:rightY+bs, rightX:rightX+bs]))
+"""
+Heuristicas implementadas:
+-Flat: assume qe os matches corretos estarao todos para o mesmo lado,
+    assim penaliza os que estao para o lado contrario, e premia os que estao para o lado "correto"
+    *params => {"alpha" : number >= 0 } forca da penalizacao e premiacao
+-Picos discretos: baseia-se no fato de que a maioria dos matches tem um deslocamento proximo,
+    beneficia blocos em um numero fixo de posicoes, escolhidas pela frequencia de matches.
+    Aumenta o tempo de execucao pois requer uma passagem anterior do algoritmo para determinar as frequencias
+    *params => {
+            
+"""
 
-def minimize_sad(edge_left:np.ndarray, edge_right:np.ndarray, dimensions:np.shape,
-                 y:int, x:int, config:dict=config_dict
-                 )-> tuple[tuple[int, int], tuple[int, int]]:
-
-        best_sad_l2r = np.inf
-        best_coord_l2r = (None, None)
-        best_sad_r2l = np.inf
-        best_coord_r2l = (None, None)
-
-        for iterX in range(x  - config["horizontal_window"], x  + config["horizontal_window"] + 1):
-            for iterY in range(y - config["vertical_window"], y + config["vertical_window"] + 1):
-                if utils.valid_block(iterY, iterX, dimensions, config):
-                    #left to right
-                    cur_sad = sad(y, x, iterY, iterX, edge_left, edge_right) + in_match(iterY-y,iterX-x, config)
-                    if cur_sad <= best_sad_l2r:
-                        best_sad_l2r = cur_sad
-                        best_coord_l2r = (iterY, iterX)
-                    #right to left
-                    cur_sad = sad(iterY, iterX, y, x, edge_left, edge_right) + in_match(iterY-y,-iterX+x, config)
-                    if cur_sad <= best_sad_r2l:
-                        best_sad_r2l = cur_sad
-                        best_coord_r2l = (iterY, iterX)
-        
-        return best_coord_l2r, best_coord_r2l
 
 
 def discrete_points_preprocess(edge_left:np.ndarray, edge_right:np.ndarray,config : dict = config_dict) -> tuple[np.ndarray, np.ndarray]:

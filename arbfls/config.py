@@ -1,43 +1,27 @@
-"""Configuration dictionary for the package"""
+# Dicionario de configuracao do pacote, estas sao as configracoes padrao
+# Para utilizar configuracoes customizadas eh possivel alterar neste arquivo ou passar um dicionario alterado como argumento
 
 config_dict = {
-    "show" : False, #Flag for interactive mode
-    "horizontal_window" : 35, #Search window on x axis
-    "vertical_window" : 3, #Search window on y axis
-    "block_size"  : 8, #Block size (square)
-    "mh_sigma" : 0.6, #Sigma parameter for marr-hildereth
-    "canny_parameters" : (1.0, 2.0, 5, True), #Low tresh, High thresh, aperture, L2Gradient for canny (Legacy)
-    "pre_processing" : "laplacian", #Edge detection algorithm used (see preprocessing)
-    "heuristic" : "flat", #Type of heuristic used
-    "heuristic_params" : { #The parameters used for the heuristic, must be adjusted to each type
+    "show" : False, # Flag para modo interativo
+    "horizontal_window" : 35, # Tamanho horizontal da janela de busca
+    "vertical_window" : 3, # Tamanho vertical da janela de busca
+    "block_size"  : 8, # Tamanho do bloco (lado do quadrado)
+    "mh_sigma" : 0.6, # Parametro sigma do filtro gaussiano aplicado no pre processamento laplaciano/marr-hildereth
+    "canny_parameters" : (1.0, 2.0, 5, True), # Parametros do Detector de Bordas de Canny para pre processamento
+    # (limiar inferior, limiar superior, tamanho do kernel gaussiano e uso da norma L2 para o gradiente)
+    "pre_processing" : "laplacian", # Algoritmo de pre processamento
+    "heuristic" : "flat", # Tipo de heuristica utilizada
+    "heuristic_params" : { # Parametros da heuristica, ajustados de acordo com o tipo
         "alpha" : 1500,
         "beta" : 900,
         "npeaks" : 5
     },
-    "heuristic_variables": { #Returned by the heuristic preprocessing
-
-    },
-    "dinamic_window" : False, # Adjust the size of the horiontal window dinamically
-    "dw_config" : {
+    "heuristic_variables": {}, # Retornados pelo pre processamento da heuristica
+    "dinamic_window" : False, # Ativa o ajuste automatico da janela de busca
+    "dw_config" : { # Configuracoes da busca dinamica da janela
         "threshold" : 0.04,
         "extension" : 1.33
     },
-    "anaglyph_type" : "green_magenta",  #green_magenta || red_cyan || blue_yellow
-    "verbose" : True
+    "anaglyph_type" : "green_magenta",  #green_magenta || red_cyan || blue_yellow (Tipo de anaglifo por cor)
+    "verbose" : True # Ativa verbosiddade
 }
-
-
-
-# Pre processing options
-pp_list = ["laplacian", "marr_hildereth", "canny"]
-
-# Heuristic options
-h_list = ["none", "flat", "discrete_points"]
-"""
-params for discrete_points
-"heuristic_params" : {
-    "alpha" : 1000,
-    "beta" : 300,
-    "npeaks" : 4
-}
-"""
