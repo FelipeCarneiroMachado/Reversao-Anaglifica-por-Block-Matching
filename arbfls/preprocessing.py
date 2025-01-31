@@ -1,4 +1,6 @@
 #Contain the edge detection algorithms
+import time
+
 import numpy as np
 import cv2 as cv
 import imageio as iio
@@ -74,10 +76,8 @@ def sobel_wrap(img:np.ndarray):
 
     return grad_x
 
-    
 
-
-def makeEdgeImages(l:np.ndarray, r:np.ndarray, config:dict =  config_dict)->tuple[np.ndarray]:
+def applyPreProcessing(l:np.ndarray, r:np.ndarray, config:dict =  config_dict)->tuple[np.ndarray]:
     match config["pre_processing"]:
         case "laplacian":
             return (
@@ -85,27 +85,20 @@ def makeEdgeImages(l:np.ndarray, r:np.ndarray, config:dict =  config_dict)->tupl
                 edgesMarrHildreth(cv.cvtColor(r, cv.COLOR_RGB2GRAY), config["mh_sigma"])[0]
             )
         case "abs_laplacian":
-            print("Warning: Absolute laplacian edge detection has shown worse results than the laplacian.")
-            print("Be sure you are using the correct configuration")
             return (
                 np.abs(edgesMarrHildreth(cv.cvtColor(l, cv.COLOR_RGB2GRAY), config["mh_sigma"])[0]), 
                 np.abs(edgesMarrHildreth(cv.cvtColor(r, cv.COLOR_RGB2GRAY), config["mh_sigma"])[0])
             )
         case "canny":
-            print("Warning: Canny edge detection has shown worse results than the laplacian.")
-            print("Be sure you are using the correct configuration")
             params =  config["canny_parameters"]
             return (
                 cv.Canny(l, params[0], params[1], apertureSize=params[2], L2gradient=params[3]).astype(np.int32),
                 cv.Canny(r, params[0], params[1], apertureSize=params[2], L2gradient=params[3]).astype(np.int32)
             )
         case "marr_hildereth":
-            print("Warning: Marr Hildereth edge detection has shown worse results than the laplacian in wich it is based.")
-            print("Be sure you are using the correct configuration")
             return (edgesMarrHildreth(cv.cvtColor(l, cv.COLOR_RGB2GRAY), config["mh_sigma"])[1].astype(np.int32), 
                     edgesMarrHildreth(cv.cvtColor(r, cv.COLOR_RGB2GRAY), config["mh_sigma"])[1].astype(np.int32))
         case "sobel":
-            # One more failed attempt
             return (
                 sobel_wrap(l),
                 sobel_wrap(r)

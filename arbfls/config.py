@@ -27,9 +27,6 @@ config_dict = {
 }
 
 
-# Table name for sql registering of experiments
-# WARNING: This parameter can only be set trough this file
-table_name = "january_testing"
 
 # Pre processing options
 pp_list = ["laplacian", "marr_hildereth", "canny"]
