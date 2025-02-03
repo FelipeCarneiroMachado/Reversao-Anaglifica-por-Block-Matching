@@ -85,35 +85,36 @@ def valid_block(y : int, x : int, dimensions:tuple[int, int, int], config : dict
         return False
 
 #Returns the image with the given block , does not alter the image
-def contour_block(image : np.ndarray, colour : tuple, coordinates : tuple[int, int], config : dict = config_dict) -> np.ndarray:
+def contour_block(image : np.ndarray, colour : tuple | int, coordinates : tuple[int, int], config : dict = config_dict) -> np.ndarray:
     image = image.copy()
+    dimensions = image.shape[:2]
     for x in range(coordinates[0] -1, coordinates[0] + config["block_size"] + 1):
-        if valid_coordinate(x, coordinates[1] - 1):
+        if valid_coordinate(x, coordinates[1] - 1, dimensions):
             image[x, coordinates[1] - 1] = colour
-        if valid_coordinate(x, coordinates[1] + config["block_size"] + 1):
+        if valid_coordinate(x, coordinates[1] + config["block_size"] + 1, dimensions):
             image[x, coordinates[1] + config["block_size"] + 1] = colour
     for y in range(coordinates[1] -1, coordinates[1] + config["block_size"] + 1):
-        if valid_coordinate(coordinates[0] - 1, y):
+        if valid_coordinate(coordinates[0] - 1, y, dimensions):
             image[coordinates[0] - 1, y] = colour
-        if valid_coordinate(coordinates[0] + config["block_size"] + 1, y):
+        if valid_coordinate(coordinates[0] + config["block_size"] + 1, y, dimensions):
             image[coordinates[0] + config["block_size"] + 1, y] = colour
     return image
 
 #Returns the image with the search window contoured, does not alter the image
-def contour_search_window(image:np.ndarray, colour:tuple, coordinates:tuple[int, int], config:dict = config_dict)->np.ndarray:
+def contour_search_window(image:np.ndarray, colour:tuple | int, coordinates:tuple[int, int], config:dict = config_dict)->np.ndarray:
     image = image.copy()
+    dimensions = image.shape[:2]
     for y in range(coordinates[0] - config["vertical_window"] - 1, coordinates[0] + config["block_size"] + config["vertical_window"] + 1):
-        if valid_coordinate(y, coordinates[1] - config["horizontal_window"]- 1):
+        if valid_coordinate(y, coordinates[1] - config["horizontal_window"]- 1, dimensions):
             image[y, coordinates[1] - config["horizontal_window"]- 1] = colour
-        if valid_coordinate(y, coordinates[1] +  config["horizontal_window"] +config["block_size"] + 1):
+        if valid_coordinate(y, coordinates[1] +  config["horizontal_window"] +config["block_size"] + 1, dimensions):
             image[y, coordinates[1] +  config["horizontal_window"] +config["block_size"] + 1] = colour
     for x in range(coordinates[1] -config["horizontal_window"] - 1, coordinates[1]+config["horizontal_window"] + config["block_size"] + 1):
-        if valid_coordinate(coordinates[0] -config["vertical_window"]- 1, x):
+        if valid_coordinate(coordinates[0] -config["vertical_window"]- 1, x, dimensions):
             image[coordinates[0] -config["vertical_window"]- 1, x] = colour
-        if valid_coordinate(coordinates[0] + config["block_size"] +config["vertical_window"]+ 1, x):
+        if valid_coordinate(coordinates[0] + config["block_size"] +config["vertical_window"]+ 1, x, dimensions):
             image[coordinates[0] + config["block_size"] +config["vertical_window"]+ 1, x] = colour
     return image
-
 
 # Return the channels to the original dimensions
 def return_dimensions(result_left:np.ndarray, result_right:np.ndarray, dimensions:np.shape, config:dict = config_dict) -> None:

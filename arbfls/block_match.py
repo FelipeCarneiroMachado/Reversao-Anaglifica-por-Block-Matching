@@ -6,6 +6,8 @@ import arbfls.utils as utils
 from arbfls.heuristic import in_match, preprocess
 from time import time
 import matplotlib.pyplot as plt
+
+from arbfls.interactive import show_proccess
 from arbfls.sad import sad, minimize_sad
 
 # Funcoes de iteracao pelos canais do anaglifo, computacao das diferencas, escolha de bloco e transferencia de cor
@@ -81,5 +83,8 @@ def block_matching(color_left:np.ndarray, color_right:np.ndarray,
         for x in range(0, dimensions[1], config["block_size"]):
             l_match, r_match = minimize_sad(pre_processed_left, pre_processed_right, dimensions, y, x, config)
             color_transfer((y, x), l_match, r_match, color_left, color_right, result_left, result_right, config)
+            if config["interactive"]:
+                show_proccess((y,x), l_match, "left",
+                              result_left, result_right, color_left, color_right, config, pre_processed_left, pre_processed_right)
     return result_left, result_right
                    
