@@ -21,6 +21,8 @@ caso contrário, a seção "Executando o código" contém as instruções para u
 
 ## Executando o código
 
+### Download e dependências
+
 O projeto foi desenvolvido inteiramente em linguagem python, na versão 3.12. 
 Assim, é necessário que o interpretador python esteja instalado em versão compatível.
 
@@ -39,6 +41,39 @@ python3 -m venv .
 source $(pwd)/bin/activate
 pip install -r requirements.txt
 ```
+
+Resolvida a instalação, está disponível no diretório raiz o arquivo `demo.py`, com uma 
+demonstração num anáglifo gerado a partir das 2 imagens no diretório `demo_images`.
+
+
+### Sobre o pacote
+
+O pacote possui a função `arbfls.anagl_reverse.reverse` como ponto de entrada. Esta é
+a função de reversão anaglífica em si. 
+
+```python
+def reverse(anaglyph : np.ndarray, config : dict = config_dict) -> tuple[np.ndarray, np.ndarray]:
+```
+
+No arquivo `arbfls.config` está o dicionário de configuração do pacote, estando definidos 
+os parâmetros padrão. Para alterá-los, é possível alterar diretamente o arquivo, ou passar
+uma cópia alterada do dicionário para a função `reverse` e outras funções que tenham esse
+parâmetro.
+
+Além da função `reverse`, o pacote possui no arquivo `utils.py` a função `gen_anaglyph`,
+para gerar um anáglifo a partir de um par estereo, e a função `calculate_psnr` que computa
+o PSNR (*Peak Signal to Noise Ratio*), métrica objetiva para a qualidade da reconstrução da imagem.
+
+As demais funções presentes no pacote são de uso interno, podendo e devendo ser consultadas
+para possibilidades de configuração.
+
+
+Por ser um código desenvolvido com o fim de pesquisa e divulgação científica, está munido
+com um modo interativo, que pode ser ativado com a chave "interactive" do dicionário 
+de configuração, atribuindo-a o valor `True`. Neste modo, cada passo do algoritmo será 
+mostrado visualmente, mostrando o bloco em questão, a janela de busca e a correspondência
+realizada, teclar sobre a janela procede para a próxima iteração.
+
 
 
 
