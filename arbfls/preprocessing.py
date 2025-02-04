@@ -9,15 +9,18 @@ import arbfls.utils as utils
 
 
 
-
+"""
+Deteccao de bordas de marr-hildereth, retorna tanto o Laplaciano da Gaussiana, quanto a imagem de bordas
+Creditos a: Adeel Ahmad, disponivel em https://github.com/adl1995/edge-detectors/blob/master/marr-hildreth-edge.py
+Usada como opcao de pre-processamento, apresentando melhores resultados
+Parametros:
+- img: a imagem 
+- sigma: ddesvio padrao do filtro gaussiano
+Retorno:
+- tuple(laplaciano da gaussiana, imagem de bordas)
+"""
 def edgesMarrHildreth(img, sigma):
-    """
-            finds the edges using MarrHildreth edge detection method...
-            :param im : input image
-            :param sigma : sigma is the std-deviation and refers to the spread of gaussian
-            :return:
-            a binary edge image...
-    """
+
     size = int(2*(np.ceil(3*sigma))+1)
 
     x, y = np.meshgrid(np.arange(-size/2+1, size/2+1),
@@ -53,30 +56,47 @@ def edgesMarrHildreth(img, sigma):
 
     return log, zero_crossing
 
+"""
+Computa gradientes de sobel de uma imagem, opcao de pre-processamento com resultados inferiores
+Parametros:
+- img: a imagem 
+- mode: o que deve ser retornada
+    x -> derivada em funcao de x
+    y -> derivada em funcao de y
+    l1 -> |dx| + |dy| (aproximacao da norma eucliddiana do gradiente, mais rapido)
+    l2 -> sqrt(dx^2 + dy^2) (calculo da norma euclidiana do gradiente, mais lento)
+    ang -> arctan(dy/dx),  angulo do vetor gradiente
+Retorno:
+    matriz/imagem processada
+"""
+def sobel_wrap(img:np.ndarray, mode):
+    gray = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
+    gray = cv.GaussianBlur(gray, (7, 7), 0)
+    dx, dy = cv.spatialGradient(gray)
 
-def sobel_wrap(img:np.ndarray):
-    src = cv.GaussianBlur(img, (3, 3), 0)
-    gray = cv.cvtColor(src, cv.COLOR_RGB2GRAY)
-    scale = 1
-    delta = 0
-    ddepth = cv.CV_16S
+    match mode:
+        case "x":
+            return dx
+        case "y":
+            return dy
+        case "l1":
+            return np.abs(dx) + np.abs(dy)
+        case "l2":
+            return np.sqrt(dx**2 + dy**2)
+        case "ang":
+            return np.arctan2(dy, dx)
+        case _:
+            raise NotImplementedError
 
-    grad_x = cv.Sobel(gray, ddepth, 1, 0, scale=scale, delta=delta, borderType=cv.BORDER_DEFAULT)
-    grad_y = cv.Sobel(gray, ddepth, 0, 1, scale=scale, delta=delta, borderType=cv.BORDER_DEFAULT)
-
-
-    module_aprox = np.abs(grad_x) + np.abs(grad_y)
-
-    absx = np.abs(grad_x)
-    absy = np.abs(grad_y)
-
-
-    module = np.sqrt(np.square(grad_x.astype(np.int64)) + np.square(absy.astype(np.int64)))
-
-
-    return grad_x
-
-
+"""
+Aplica o pre processamento especificado pelas configuracoes
+Parameters
+- l: canal esquerdo
+- r: canal direito
+- config: dicionario de configuracao, por padrao, config.config_dict
+Retorno:
+    tuple(esquerda processada, direita processada)
+"""
 def applyPreProcessing(l:np.ndarray, r:np.ndarray, config:dict =  config_dict)->tuple[np.ndarray]:
     match config["pre_processing"]:
         case "laplacian":
@@ -98,10 +118,30 @@ def applyPreProcessing(l:np.ndarray, r:np.ndarray, config:dict =  config_dict)->
         case "marr_hildereth":
             return (edgesMarrHildreth(cv.cvtColor(l, cv.COLOR_RGB2GRAY), config["mh_sigma"])[1].astype(np.int32), 
                     edgesMarrHildreth(cv.cvtColor(r, cv.COLOR_RGB2GRAY), config["mh_sigma"])[1].astype(np.int32))
-        case "sobel":
+        case "sobel_x":
             return (
-                sobel_wrap(l),
-                sobel_wrap(r)
+                sobel_wrap(l, "x"),
+                sobel_wrap(r, "x")
+            )
+        case "sobel_y":
+            return (
+                sobel_wrap(l, "y"),
+                sobel_wrap(r, "y")
+            )
+        case "sobel_l1":
+            return (
+                sobel_wrap(l, "l1"),
+                sobel_wrap(r, "l1")
+            )
+        case "sobel_l2":
+            return (
+                sobel_wrap(l, "l2"),
+                sobel_wrap(r, "l2")
+            )
+        case "sobel_ang":
+            return (
+                sobel_wrap(l, "ang"),
+                sobel_wrap(r, "ang")
             )
         case _:
             raise Exception("Unsupported preprocessing")

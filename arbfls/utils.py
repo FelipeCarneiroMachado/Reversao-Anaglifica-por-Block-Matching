@@ -1,11 +1,16 @@
-#General utilities
 import numpy as np
 import cv2 as cv
 import imageio as iio
 from arbfls.config import config_dict
 
+"""
+Utiliadades gerais para o pacote
+"""
 
-def split_channels(anaglyph : np.ndarray, config : dict = config_dict) -> tuple[np.ndarray, np.ndarray, tuple[int, int]]:
+"""
+Separa os canais esquerdo e direitos do anaglifo
+"""
+def split_channels(anaglyph : np.ndarray, config : dict = config_dict) -> tuple[np.ndarray, np.ndarray]:
     #Split the channels
     match config["anaglyph_type"]:
         case "green_magenta": 
@@ -26,11 +31,16 @@ def split_channels(anaglyph : np.ndarray, config : dict = config_dict) -> tuple[
             raise Exception("Unsuported anaglyph type")
     return l, r
   
+
+"""
+Altera as dimensoes do anaglifo de modo a ser divisivel pelo tamanho do bloco, preenchendo as bordas com preto
+"""
 def resize_anaglyph(anaglyph:np.ndarray, config:dict = config_dict):
-    f = lambda x : (config["block_size"] - (x % config["block_size"]) 
+    # Funcao para encontrar a nova dimensao
+    f = lambda x : (config["block_size"] - (x % config["block_size"])
                     if x % config["block_size"] != 0 
                     else 0)
-    #Resizing the channels
+
     resized = cv.copyMakeBorder(anaglyph
                                   , 0,
                                   f(anaglyph.shape[0]),
@@ -40,13 +50,15 @@ def resize_anaglyph(anaglyph:np.ndarray, config:dict = config_dict):
                                   value=[0, 0, 0])
     return resized
 
-#Resizes the channels so the dimensios are divisible by the block size
+"""
+Altera as dimensoes das imagens de modo a ser divisivel pelo tamanho do bloco, preenchendo as bordas com preto
+"""
 def resize_channels(l:np.ndarray, r:np.ndarray, config:dict = config_dict)->tuple[np.ndarray,np.ndarray, np.shape]:
-    #This function makes so the new size is divisible by the blocks
+    # Funcao para encontrar a nova dimensao
     f = lambda x : (config["block_size"] - (x % config["block_size"]) 
                     if x % config["block_size"] != 0 
                     else 0)
-    #Resizing the channels
+
     resized_l = cv.copyMakeBorder(l
                                   , 0,
                                   f(l.shape[0]),
@@ -64,7 +76,9 @@ def resize_channels(l:np.ndarray, r:np.ndarray, config:dict = config_dict)->tupl
     return resized_l, resized_r, resized_l.shape
 
 
-#Returns if a coordinate is valid
+"""
+Retorna se uma dada coordenada eh um ponto valido da imagem
+"""
 def valid_coordinate(y:int, x:int, dimensions:tuple[int, int, int])->bool:
     if x >= 0 and x < (dimensions[1]):
         if y >= 0 and y < (dimensions[0]):
@@ -74,7 +88,10 @@ def valid_coordinate(y:int, x:int, dimensions:tuple[int, int, int])->bool:
     else:
         return False
     
-#Determines if the coordinate is a valid value for a block
+"""
+Retorna se uma dada coordenada corresponde a um bloco inteiramente dentro da imagem 
+note que o bloco eh representado pelo canto superior esquerdo
+"""
 def valid_block(y : int, x : int, dimensions:tuple[int, int, int], config : dict = config_dict) -> bool:
     if x >= 0 and x <= (dimensions[1] - config["block_size"]):
         if y >= 0 and y <= (dimensions[0] - config["block_size"]):
@@ -84,39 +101,10 @@ def valid_block(y : int, x : int, dimensions:tuple[int, int, int], config : dict
     else:
         return False
 
-#Returns the image with the given block , does not alter the image
-def contour_block(image : np.ndarray, colour : tuple | int, coordinates : tuple[int, int], config : dict = config_dict) -> np.ndarray:
-    image = image.copy()
-    dimensions = image.shape[:2]
-    for x in range(coordinates[0] -1, coordinates[0] + config["block_size"] + 1):
-        if valid_coordinate(x, coordinates[1] - 1, dimensions):
-            image[x, coordinates[1] - 1] = colour
-        if valid_coordinate(x, coordinates[1] + config["block_size"] + 1, dimensions):
-            image[x, coordinates[1] + config["block_size"] + 1] = colour
-    for y in range(coordinates[1] -1, coordinates[1] + config["block_size"] + 1):
-        if valid_coordinate(coordinates[0] - 1, y, dimensions):
-            image[coordinates[0] - 1, y] = colour
-        if valid_coordinate(coordinates[0] + config["block_size"] + 1, y, dimensions):
-            image[coordinates[0] + config["block_size"] + 1, y] = colour
-    return image
 
-#Returns the image with the search window contoured, does not alter the image
-def contour_search_window(image:np.ndarray, colour:tuple | int, coordinates:tuple[int, int], config:dict = config_dict)->np.ndarray:
-    image = image.copy()
-    dimensions = image.shape[:2]
-    for y in range(coordinates[0] - config["vertical_window"] - 1, coordinates[0] + config["block_size"] + config["vertical_window"] + 1):
-        if valid_coordinate(y, coordinates[1] - config["horizontal_window"]- 1, dimensions):
-            image[y, coordinates[1] - config["horizontal_window"]- 1] = colour
-        if valid_coordinate(y, coordinates[1] +  config["horizontal_window"] +config["block_size"] + 1, dimensions):
-            image[y, coordinates[1] +  config["horizontal_window"] +config["block_size"] + 1] = colour
-    for x in range(coordinates[1] -config["horizontal_window"] - 1, coordinates[1]+config["horizontal_window"] + config["block_size"] + 1):
-        if valid_coordinate(coordinates[0] -config["vertical_window"]- 1, x, dimensions):
-            image[coordinates[0] -config["vertical_window"]- 1, x] = colour
-        if valid_coordinate(coordinates[0] + config["block_size"] +config["vertical_window"]+ 1, x, dimensions):
-            image[coordinates[0] + config["block_size"] +config["vertical_window"]+ 1, x] = colour
-    return image
-
-# Return the channels to the original dimensions
+"""
+Retorna os canais as dimensoes originais
+"""
 def return_dimensions(result_left:np.ndarray, result_right:np.ndarray, dimensions:np.shape, config:dict = config_dict) -> None:
     bs = config["block_size"]
     f = lambda x :  -(bs - (x % bs)) if x % bs != 0 else x
@@ -124,7 +112,9 @@ def return_dimensions(result_left:np.ndarray, result_right:np.ndarray, dimension
     r = result_right[:dimensions[0], :dimensions[1]]
     return l, r
 
-
+"""
+Gera uma anaglifo a partir de um par estereo
+"""
 def gen_anaglyph(l:np.ndarray, r:np.ndarray, config:dict = config_dict) -> np.ndarray:
     match config["anaglyph_type"]:
         case "green_magenta": 
@@ -142,4 +132,14 @@ def gen_anaglyph(l:np.ndarray, r:np.ndarray, config:dict = config_dict) -> np.nd
         case _:
             raise Exception("Unsuported anaglyph type")
     return anaglyph
+
+"""
+Calcula o psnr entre 2 imagens, metrica objetiva da qualidade de reconstrucao
+"""
+def calculate_psnr(img1, img2, max_value=255):
+    mse = np.mean((np.array(img1, dtype=np.float32) - np.array(img2, dtype=np.float32)) ** 2)
+    if mse == 0:
+        return 100
+    return 20 * np.log10(max_value / (np.sqrt(mse)))
+
 

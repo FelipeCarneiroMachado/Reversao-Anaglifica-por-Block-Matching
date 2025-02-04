@@ -2,7 +2,7 @@
 # Para utilizar configuracoes customizadas eh possivel alterar neste arquivo ou passar um dicionario alterado como argumento
 
 config_dict = {
-    "show" : False, # Flag para modo interativo
+    "interactive" : False, # Flag para modo interativo
     "horizontal_window" : 35, # Tamanho horizontal da janela de busca
     "vertical_window" : 3, # Tamanho vertical da janela de busca
     "block_size"  : 8, # Tamanho do bloco (lado do quadrado)

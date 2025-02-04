@@ -24,12 +24,12 @@ def sad(leftY:int, leftX:int, rightY:int, rightX:int,
 # Args:
 #     left_channel: canal esquerdo
 #     right_channel: canal direito
-#     dimensions : dimensoes das imagens
+#     dimensions: dimensoes das imagens
 #     y: coordenada Y do canto superior esquerdo do bloco para o qual esta sendo realizada a busca
 #     x: coordenada X do canto superior esquerdo do bloco para o qual esta sendo realizada a busca
 #     config: dicionario de configuracao, por padrao, config.config_dict
 # Retorno:
-#     as coordenadas (Y,X) da correspondencia esquerda para a direita, e as coordenadas (Y, X) da correspondencia direita para esquerda
+#     as coordenadas (Y, X) da correspondencia esquerda para a direita, e as coordenadas (Y, X) da correspondencia direita para esquerda
 def minimize_sad(left_channel:np.ndarray, right_channel:np.ndarray, dimensions:np.shape,
                  y:int, x:int, config:dict=config_dict
                  )-> tuple[tuple[int, int], tuple[int, int]]:

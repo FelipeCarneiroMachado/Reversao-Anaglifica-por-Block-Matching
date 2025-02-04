@@ -1,7 +1,7 @@
 # Reversão Anaglífica através de Block Matching (WIP)
 
 Este repositório contém o código e material desenvolvido no projeto de iniciação 
-científica entitulado "Reversão Anaglífica utilizadno Block Matching", desenvolvido 
+científica intitulado "Reversão Anaglífica utilizando Block Matching", desenvolvido 
 por Felipe Carneiro Machado, estudante do Bacharelado em Ciências da Computação, 
 no ICMC, Instituto de Ciências Matemáticas e de Computação, da USP, campus de
 São Carlos, sob orientação de Rudinei Goularte, Professor Associado no ICMC, 
@@ -9,7 +9,7 @@ departamento de ciências da computação.
 
 A reversão é o processo de recuperar um par estereo a partir de um anáglifo. Neste 
 projeto, foi estudado o uso do algoritmo de Block Matching para este fim. Caso não 
-esteja familizarizado com estes termos, prossiga para a seção de fundamentos teóricos,
+esteja familiarizado com estes termos, prossiga para a seção de fundamentos teóricos,
 caso contrário, a seção "Executando o código" contém as instruções para uso.
 
 
@@ -31,8 +31,8 @@ Podendo ser baixado clonando o repositório com:
 git clone https://github.com/FelipeCarneiroMachado/Reversao-Anaglifica-por-Block-Matching.git
 ```
 
-Também será necessário instalar as depedências do projeto, utlizando o pip dentro de
-um venv python:
+Também será necessário instalar as dependências do projeto, utilizando o pip num
+venv python:
 
 ```shell
 python3 -m venv .
