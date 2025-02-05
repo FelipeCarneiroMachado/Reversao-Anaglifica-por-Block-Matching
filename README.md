@@ -107,7 +107,11 @@ do par estereo, e os dois canais restantes da outra imagem, assumindo o padrão 
 codificação de cor. Vale notar que este processo descarta 50% da informação do par estereo.
 Segue abaixo uma representação visual do processo.
 
-![Exemplo de Anaglifo](assets/Ex_anagl_2.png)
+
+<figure>
+    <img alt="Exemplo de anaglifo" src="assets/Ex_anagl_2.png">
+    <figcaption style="text-align: center;">Fonte: Autoral</figcaption>
+</figure>
 
 A visualização anaglífica é possível pela fusão das imagens pelo cérebro humano,
 já que grande parte da informação descartada de cada peça do par estereo está
@@ -142,4 +146,63 @@ e as regiôes de baixa textura, partes das imagens de cores sólidas ou com padr
 repetitivos, que dificultam formar certeza sobre a correspodência correta. A correspondência
 anaglífica, por sua vez, ainda deve lidar com as diferenças radicais entre as imagens, 
 pois a comparação é realizada entre canais de cores diferentes.
+
+### 3. Block Matching
+
+O *Block Matching* é um algoritmo de correspondência, muito utilizado para 
+estimação de movimento em vídeo, que forma a base da técnica discutida neste projeto.
+Baseia-se em busca local por correspondência, 
+tomando um bloco como base e buscando na outra imagem, numa janela de busca
+que circunda a original o bloco que minimiza uma métrica de
+erro adotada.  
+
+<figure>
+    <img alt="Exemplo do block matching" src="assets/bm_ex.png">
+    <figcaption style="text-align: center;"><a href="https://ijaers.com/uploads/issue_files/46-IJAERS-MAY-2018-43-Motion.pdf">Fonte</a></figcaption>
+</figure>
+
+## Técnica desenvolvida
+
+O processo implementado foi baseado na dissertação de mestrado de Juliano Kunze,
+disponível neste repositório, buscando implementar melhorias pontuais no desempenho.
+Kunze nomeou sua técnica como *ARBFLS* (*Analgyphical Rerversion Based on Fast Local Search*),
+ou Reversão Anaglífica Baseada em Busca Local Rápida. Utiliza-se do *Block Matching* atuando
+sobre uma representação das bordas das imagens para realizar a busca das correspondências.
+
+A técnica pode ser divida em duas etapas principais: Pré-processamento de imagem, onde
+são geradas as representações das imagens, e busca de correspondências e transferência 
+de cor, aplicando o block matching e reconstruindo o par estereo.
+
+### Pré-processamento
+
+Primeiramente, é necessário separar os canais de cores do anáglifo em esquerda e direita.
+A execução desse passo depende apenas do tipo de anáglifo em questão, ou seja, como
+foi feito o descarte de cores. Nesta implementação foi dada enfâse aos anáglifos verde-magenta,
+nos quais é mantido o canal verde do lado esquerdo e os canais vermelho e azul do lado direito.
+Logo, basta separar estes canais no anáglifo, além disso, na imagem esquerda é replicado
+em todos os canais o verde extraído do anáglifo, e na direita, o canal verde recebe o azul.
+
+A grande dificuldade da reversão anaglífica é a impossibilidade de comparação direta entre
+as visões esquerda e direita, devido à diferença de cores. Para contornar este problema, 
+Kunze propõe realizar a correspondência sobre as imagens de bordas. Em sua dissertação,
+faz uso do detector de bordas de Canny, baseado na aplicação do operador gradiente sobre 
+a imagem.
+
+### Busca de Correspondência e Transferência de cor
+
+A técnica baseia-se em buscar o bloco correspondente na imagem de bordas, e transferir para
+os canais descartados os valores de pixel encontrados neste bloco. 
+
+#### Block Matching em detalhes
+
+O algoritmo particiona as imagens em blocos de tamanho fixo, e, para cada imagem do par,
+itera sobre cada um dos blocos buscando o seu correspondente na outra imagem. Em cada busca
+por correspondência, itera-se sobre uma janela de busca em torno das coordenadas iniciais 
+do bloco aplicando uma função de perda em cada bloco presente nessa janela. A função 
+escolhida neste caso é a soma das diferenças absolutas (SAD) definida por:
+
+![Equacao SAD](https://quicklatex.com/cache3/2a/ql_1f4d302009aa192b9aad4573b8066a2a_l3.png)
+
+Onde x e y são as coordenadas na imagem original I, x' e y' as coordenadas na imagem onde está
+sendo buscada a correspondência I' e Tb é o tamanho do bloco.
 
