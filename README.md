@@ -19,6 +19,12 @@ caso contrário, a seção "Executando o código" contém as instruções para u
 
 - [Fundamentos teóricos](#fundamentos-teóricos)
 
+- [Técnica Desenvolvida](#técnica-desenvolvida)
+
+- [Tópicos Abordados Neste Projeto](#tópicos-abordados-neste-projeto)
+
+
+
 ## Executando o código
 
 ### Download e dependências
@@ -205,4 +211,73 @@ escolhida neste caso é a soma das diferenças absolutas (SAD) definida por:
 
 Onde x e y são as coordenadas na imagem original I, x' e y' as coordenadas na imagem onde está
 sendo buscada a correspondência I' e Tb é o tamanho do bloco.
+
+### Avaliação de Resultados
+
+A avaliação da qualidade de uma restauração de imagem é marcada pela subjetividade, não há
+método objetivo para avaliar a compreensão humana de uma figura, dessa forma são necessários
+testes com voluntários para avaliar a sua percepção, realizados seguindo processos rigorosos.
+Detalhes e resultados deste tipo de avaliação estão disponíveis na dissertação de Kunze.
+
+Pode-se estabelecer como métrica objetiva e calculável da qualidade da reconstrução do par
+estereo o PSNR (*Peak-Signal to Noise Ratio*),
+métrica entre 0 e 100 relativa ao erro quadrático médio entre a imagem original e
+sua reconstrução. A seguinte equação é utilizada para seu cálculo:
+
+
+![Equacao PSNR](https://quicklatex.com/cache3/da/ql_e376a06e8a729c47f7c15a7dea5b3fda_l3.png)
+
+## Tópicos abordados neste Projeto
+
+Este projeto de Iniciação científica foi iniciado com o objetivo de melhorar os resultados
+desta técnica a partir de alterações pontuais no algoritmo. Esta seção cobre as mudanças propostas.
+
+### Substituição da detecção de bordas de Canny
+
+Manteve-se a ideia de representar uma imagem a partir de suas bordas, já que esta é uma
+representação independente de cor. Forma testados a aplicação dos filtros: Gradiente de Sobel,
+Detecção de Bordas de Marr-Hildreth e Laplaciano.
+
+#### Gradiente de Sobel
+
+Operador diferencial de primeira ordem, computa as derivadas direcionais para cada pixel
+da imagem, a Detecção de Bordas de Canny baseia-se neste filtro.
+O gradiente terá valores altos em bordas (diferenças bruscas de intensidade) e valor constante
+em regiões com mudança gradual de intensidade. Regiões sem textura terão valores baixos.
+Utilizou-se uma suavização
+da imagem a partir de um filtro gaussiano antes da aplicação do gradiente para minimização do
+ruído. 
+
+A aplicação dos filtros gera 2 imagens, com as derivadas nas direções x e y, para obter uma
+representação única, testou-se o uso da derivada em x, em y, a norma euclidiana, a aproximação
+da norma a partir da soma dos módulos e o ângulo do vetor.
+
+RESULTADOS A SEREM INSERIDOS
+
+#### Laplaciano
+
+Operador diferencial de segunda ordem, computa a soma das segundas derivadas direcionais
+e é a base do Detector de Bordas de Marr-Hildreth. Em comparação ao gradiente, é mais sensível
+às bordas, porém também afetado em maior proporção pelo ruído. Não resulta em valores altos
+em regiões com variação gradual de intensidade.
+
+Um detalhe do Laplaciano, é que ao se deparar com uma linha/borda, ele deixa dois picos
+de intensidade, um positivo e outro negativo, correspondendo às laterais da borda, e não 
+à borda em si, fato utilizado pelo detector de Marr-Hildreth, a ser detalhado em seguida.
+
+Da mesma forma que todas as outras técnicas, aplicou-se suavização gaussiana para minimizar 
+ruído. Foram testadas duas formas de pré-processamento com o Laplaciano, seu valor integral
+e seu valor absoluto. 
+
+RESULTADOS AS SEREM INSERIDOS
+
+#### Detecção de bordas de Marr-Hildereth
+
+Consiste na aplicação do Laplaciano na imagem, após suavizamento gaussiano, e buscar
+os pontos onde há cruzamento por zero, ou seja, os pixels onde o valor é negativo de um lado
+e positivo do outro. Como explicado na seção do Laplaciano, estes são considerados como 
+as bordas na saĩda do algoritmo.
+
+RESULTADOS A SEREM INSERIDOS
+
 
