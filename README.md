@@ -1,4 +1,4 @@
-# Reversão Anaglífica através de Block Matching (WIP)
+# Reversão Anaglífica através de Block Matching
 
 Este repositório contém o código e material desenvolvido no projeto de iniciação 
 científica intitulado "Reversão Anaglífica utilizando Block Matching", desenvolvido 
