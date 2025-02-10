@@ -175,9 +175,11 @@ Kunze nomeou sua técnica como *ARBFLS* (*Analgyphical Rerversion Based on Fast 
 ou Reversão Anaglífica Baseada em Busca Local Rápida. Utiliza-se do *Block Matching* atuando
 sobre uma representação das bordas das imagens para realizar a busca das correspondências.
 
-A técnica pode ser divida em duas etapas principais: Pré-processamento de imagem, onde
+A técnica pode ser divida em duas etapas principais: pré-processamento de imagem, onde
 são geradas as representações das imagens, e busca de correspondências e transferência 
 de cor, aplicando o block matching e reconstruindo o par estereo.
+
+
 
 ### Pré-processamento
 
@@ -194,6 +196,13 @@ Kunze propõe realizar a correspondência sobre as imagens de bordas. Em sua dis
 faz uso do detector de bordas de Canny, baseado na aplicação do operador gradiente sobre 
 a imagem.
 
+<figure>
+    <img alt="Exemplo do pré-processamento com Canny" src="assets/edge_ex.png">
+    <figcaption style="text-align: center;">Fonte: Autoral</figcaption>
+</figure>
+
+
+
 ### Busca de Correspondência e Transferência de cor
 
 A técnica baseia-se em buscar o bloco correspondente na imagem de bordas, e transferir para
@@ -207,7 +216,7 @@ por correspondência, itera-se sobre uma janela de busca em torno das coordenada
 do bloco aplicando uma função de perda em cada bloco presente nessa janela. A função 
 escolhida neste caso é a soma das diferenças absolutas (SAD) definida por:
 
-![Equacao SAD](https://quicklatex.com/cache3/2a/ql_1f4d302009aa192b9aad4573b8066a2a_l3.png)
+![Equacao SAD](https://quicklatex.com/cache3/27/ql_bb586ba8619332c7e3b194dc573fca27_l3.png)
 
 Onde x e y são as coordenadas na imagem original I, x' e y' as coordenadas na imagem onde está
 sendo buscada a correspondência I' e Tb é o tamanho do bloco.
@@ -252,7 +261,6 @@ A aplicação dos filtros gera 2 imagens, com as derivadas nas direções x e y,
 representação única, testou-se o uso da derivada em x, em y, a norma euclidiana, a aproximação
 da norma a partir da soma dos módulos e o ângulo do vetor.
 
-RESULTADOS A SEREM INSERIDOS
 
 #### Laplaciano
 
@@ -269,7 +277,7 @@ Da mesma forma que todas as outras técnicas, aplicou-se suavização gaussiana 
 ruído. Foram testadas duas formas de pré-processamento com o Laplaciano, seu valor integral
 e seu valor absoluto. 
 
-RESULTADOS AS SEREM INSERIDOS
+
 
 #### Detecção de bordas de Marr-Hildereth
 
@@ -278,6 +286,17 @@ os pontos onde há cruzamento por zero, ou seja, os pixels onde o valor é negat
 e positivo do outro. Como explicado na seção do Laplaciano, estes são considerados como 
 as bordas na saĩda do algoritmo.
 
-RESULTADOS A SEREM INSERIDOS
+#### Resultados
+
+| Pré Processamento | Média PSNR Esquerdo | Média PSNR Direito |
+|:------------------|:--------------------|:-------------------|
+| Sobel\_x          | 22.2825             | 26.03              |
+| LoG               | 23.58               | 25.9325            |
+| Abs\_laplacian    | 23.045              | 25.7525            |
+| Sobel\_l1         | 22.195              | 25.24              |
+| Sobel\_ang        | 22.08               | 24.98              |
+| Sobel\_y          | 22.085              | 24.525             |
+| Sobel\_l2         | 20.40               | 23.18              |
+| Canny             | 20.755              | 22.98              |
 
 
